@@ -28,11 +28,24 @@ def clean_date(date_str):
               'July', 'August', 'September', 'October',
               'November', 'December']
     split_date = date_str.split(' ')
-    print(split_date)
     month = int(months.index(split_date[0]) + 1)
     day = int(split_date[1].split(',')[0])
     year = int(split_date[2])
     return datetime.date(year, month, day)
+
+
+def clean_price(price_str):
+    split_price = price_str.split('$')
+    if len(split_price) < 2:
+        return None
+    nosignprice = split_price[1]
+    price_float = float(nosignprice)
+    return int(price_float * 100)
+
+
+def clean_quan(quan_str):
+    quan_int = int(quan_str)
+    return quan_int
 
 
 def add_csv():
@@ -40,6 +53,13 @@ def add_csv():
         data = csv.reader(csvfile)
         for row in data:
             print(row)
+            product = row[0]
+            price = clean_price(row[1])
+            quantity = clean_quan(row[2])
+            date = clean_date(row[3])
+            new_prod = Product(product_name=product, product_price=price, product_quantity=quantity, date_updated=date)
+            session.add(new_prod)
+        session.commit()
 
 
 def app():
@@ -60,5 +80,7 @@ def app():
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     # app()
-    #add_csv()
-    clean_date('October 25, 2017')
+    add_csv()
+
+    for prod in session.query(Product):
+        print(prod)
