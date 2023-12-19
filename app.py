@@ -1,4 +1,4 @@
-from models import Base, session, Product, engine
+from models import Base, session, Session, Product, engine
 import datetime
 import csv
 import time
@@ -91,12 +91,36 @@ def add_csv():
         session.commit()
 
 
+def view():
+    view_running = True
+    while view_running:
+        try:
+            product_id = input("Enter the ID of the Product You'd Like to View: ")
+            clean_product_id = int(product_id)
+            product = session.get(Product, clean_product_id)
+            if product:
+                print(f'''
+                \nProduct ID: {product.product_id}
+                \rProduct Name: {product.product_name}
+                \rProduct Amount: {product.product_quantity}
+                \rProduct Price: ${product.product_price / 100:.2f}
+                \rDate Updated: {product.date_updated}''')
+                input('\nPress Enter When Ready to Return to Main Menu')
+                view_running = False
+            else:
+                input('''
+                \nMake Sure Your ID is Correct!
+                \rPress Enter to Try Again''')
+        except Exception:
+            print('\nInvalid Input')
+
+
 def app():
     app_running = True
     while app_running:
         choice = menu()
         if choice == 'v':
-            pass
+            view()
         elif choice == 'a':
             name = input('Product Name: ')
             amount_error = True
@@ -137,6 +161,3 @@ if __name__ == '__main__':
 
     for prod in session.query(Product):
         print(prod)
-
-
-
