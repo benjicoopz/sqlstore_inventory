@@ -118,7 +118,7 @@ def view():
 
 def export_to_csv(database_url, table_name, csv_path):
     table_name = "inventory"
-    csv_path = r"C:\Users\benji\Desktop"
+    csv_path = "./backup.csv"
     try:
         engine2 = create_engine('sqlite:///inventory.db', echo=False)
         query = f"SELECT * FROM {table_name}"
@@ -166,8 +166,8 @@ def app():
             print('Product Added!')
             time.sleep(2)
         elif choice == 'b':
-            export_to_csv(database_url='sqlite:///inventory.db', table_name='inventory',
-                          csv_path=r'C:\Users\benji\Desktop')
+            export_to_csv(database_url='sqlite:///inventory.db',
+                          table_name='inventory', csv_path="./backup.csv")
         else:
             print('\nThanks for Checking out the Inventory!')
             app_running = False
