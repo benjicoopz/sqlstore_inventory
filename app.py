@@ -1,7 +1,8 @@
-from models import Base, session, Session, Product, engine
+from models import Base, session, Product, engine, create_engine
 import datetime
 import csv
 import time
+import pandas as pd
 
 
 def menu():
@@ -115,6 +116,23 @@ def view():
             print('\nInvalid Input')
 
 
+def export_to_csv(database_url, table_name, csv_path):
+    table_name = "inventory"
+    csv_path = r"C:\Users\benji\Desktop"
+    try:
+        engine2 = create_engine('sqlite:///inventory.db', echo=False)
+        query = f"SELECT * FROM {table_name}"
+        df = pd.read_sql(query, engine2)
+        df.to_csv(csv_path, index=False)
+        input(f'''
+        \nBackup Successful! Data exported to {csv_path}
+        \rPress Enter to Return to Main Menu.''')
+        return True
+    except Exception:
+        input('\nBackup Failed. Press Enter to Try Again.')
+        return False
+
+
 def app():
     app_running = True
     while app_running:
@@ -148,7 +166,8 @@ def app():
             print('Product Added!')
             time.sleep(2)
         elif choice == 'b':
-            pass
+            export_to_csv(database_url='sqlite:///inventory.db', table_name='inventory',
+                          csv_path=r'C:\Users\benji\Desktop')
         else:
             print('\nThanks for Checking out the Inventory!')
             app_running = False
