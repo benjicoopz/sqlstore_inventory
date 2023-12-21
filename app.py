@@ -1,4 +1,4 @@
-from models import Base, session, Product, engine, create_engine
+from models import Base, session, Session, Product, engine, create_engine
 import datetime
 import csv
 import time
@@ -141,30 +141,37 @@ def app():
             view()
         elif choice == 'a':
             name = input('Product Name: ')
-            amount_error = True
-            while amount_error:
-                amount = input('Product Quantity: ')
-                amount_clean = clean_quan(amount)
-                if type(amount_clean) == int:
-                    amount_error = False
-            price_error = True
-            while price_error:
-                price = input('Product Price (Ex:$5.70): ')
-                price_clean = clean_price(price)
-                if type(price_clean) == int:
-                    price_error = False
-            date_error = True
-            while date_error:
-                date = input('Date Updated (Ex: MM/DD/YYYY): ')
-                date_clean = clean_date(date)
-                if type(date_clean) == datetime.date:
-                    date_error = False
-            new_product = Product(product_name=name, product_quantity=amount_clean,
-                                  product_price=price_clean, date_updated=date_clean)
-            session.add(new_product)
-            session.commit()
-            print('Product Added!')
-            time.sleep(2)
+            existing_product = session.query(Product).filter_by(product_name=name).first()
+            if existing_product:
+                print(f"\nProduct '{name}' already exists. Updating information!")
+                existing_product.product_quantity = clean_quan(input('Product Quantity: '))
+                existing_product.product_price = clean_price(input('Product Price (Ex:$5.70): '))
+                existing_product.date_updated = clean_date(input('Date Updated (Ex: MM/DD/YYYY): '))
+            else:
+                amount_error = True
+                while amount_error:
+                    amount = input('Product Quantity: ')
+                    amount_clean = clean_quan(amount)
+                    if type(amount_clean) == int:
+                        amount_error = False
+                price_error = True
+                while price_error:
+                    price = input('Product Price (Ex:$5.70): ')
+                    price_clean = clean_price(price)
+                    if type(price_clean) == int:
+                        price_error = False
+                date_error = True
+                while date_error:
+                    date = input('Date Updated (Ex: MM/DD/YYYY): ')
+                    date_clean = clean_date(date)
+                    if type(date_clean) == datetime.date:
+                        date_error = False
+                new_product = Product(product_name=name, product_quantity=amount_clean,
+                                      product_price=price_clean, date_updated=date_clean)
+                session.add(new_product)
+                session.commit()
+                print('Product Added or Updated!')
+                time.sleep(2)
         elif choice == 'b':
             export_to_csv(database_url='sqlite:///inventory.db',
                           table_name='inventory', csv_path="./backup.csv")
